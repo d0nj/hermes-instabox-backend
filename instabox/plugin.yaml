@@ -1,0 +1,62 @@
+name: instabox
+label: InstaBox
+kind: backend
+version: 0.1.0
+author: Hermes contributors
+homepage: https://github.com/d0nj/hermes-instabox-backend
+description: >
+  InstaBox terminal backend for Hermes Agent: the terminal, file and code tools run
+  inside a cloud Linux machine (Firecracker microVM, Debian 13) reachable over the
+  InstaBox HTTPS API. Persistent machines are paused when idle and resumed by name;
+  ephemeral ones are deleted. Select it with `terminal.backend: instabox`; the API key
+  comes from INSTABOX_API_KEY and the template from `terminal.instabox_template`.
+requires_hermes: ">=0.21.6"
+provides_tools: []
+provides_hooks: []
+config_schema:
+  api_key:
+    type: secret
+    env: INSTABOX_API_KEY
+    label: InstaBox API key
+    description: >
+      API key (ibk_...) from https://dashboard.instabox.sh/dashboard/api-keys. Stored in
+      the profile's .env; the terminal backend reads it from the environment.
+  template:
+    type: str
+    label: Template
+    default: agent-browser
+    description: >
+      Machine template to create from (agent-browser or universal). The free plan allows
+      only agent-browser or one of your own snapshots.
+  machine:
+    type: str
+    label: Existing machine
+    description: >
+      Attach to this machine (name or m_... ID) instead of creating one. Use it on the free
+      plan (1 machine) or to reuse a machine you already set up. Commands run there; the
+      machine is left in the state it was found in, so a suspended machine stays suspended.
+  snapshot:
+    type: str
+    label: Snapshot
+    description: >
+      Start new machines from this snapshot — its name or sn_... ID — instead of a
+      template. The snapshot carries the installed software and everything under /data,
+      including home. Applies to newly created machines only; empty means use the template.
+  auto_suspend:
+    type: int
+    label: Idle pause (seconds)
+    default: 1800
+    description: >
+      Pause the machine after this much idle time. Paid plans accept 300-1800, or 0 to
+      disable; the free plan always pauses at 1800.
+  file_sync:
+    type: bool
+    label: Mirror ~/.hermes
+    default: false
+    description: >
+      Copy skills, cache files and credential files into the machine before the first command.
+  guest_user:
+    type: str
+    label: Guest user
+    description: >
+      Linux user inside the machine. Leave empty to use the snapshot's user (or "user").
